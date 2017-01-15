@@ -1,0 +1,7 @@
+secrets.py
+secrets.pyc
+.DS_Store
+ref
+ref/*
+draft
+draft/*
