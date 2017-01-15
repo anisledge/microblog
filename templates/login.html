@@ -6,7 +6,7 @@
 	<table>
 		<tr>
 			<td style="text-align:right">
-				<label>Username<input name="username" type="text"/></label>
+				<label>Username<input name="username" type="text" value="{{ username }}"/></label>
 			</td>
 		</tr>
 		<tr>
@@ -15,7 +15,10 @@
 			</td>
 		</tr>
 	</table>
+	{% if error %}
+		<div><b>The username or password is invalid.</b></div>
+	{% endif %}
 	<input type="submit" />
 </form>
 <p><a href="/signup">Sign Up</a></p>
-{% endblock %}
+{% endblock %} 
