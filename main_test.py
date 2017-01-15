@@ -1,23 +1,7 @@
-# Copyright 2016 Google Inc. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+import sys
 
-#TEST DATA
-signup_valid = { 'username': 'test', 'password': 'test1234', 'verify': 'test1234', 'email': 'test@test.com'}
-signup_invalid = { 'username': '">ha', 'password': '', 'verify': 'test123', 'email': 'test' }
-signup_error = { 'username': True, 'password': True, 'verify': True, 'email': True}
-login_valid = { 'username': 'test', 'password': 'test1234' }
-login_invalid = { 'username': '', 'password': '' }
+sys.path.append("/Users/Ani/Downloads/google-cloud-sdk/platform/google_appengine")
+sys.path.append("/Users/Ani/Downloads/google-cloud-sdk/lib/third_party")
 
 import webtest
 import blog
@@ -27,6 +11,13 @@ import jinja2
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
     autoescape = True)
+
+#TEST DATA
+signup_valid = { 'username': 'test', 'password': 'test1234', 'verify': 'test1234', 'email': 'test@test.com'}
+signup_invalid = { 'username': '">ha', 'password': '', 'verify': 'test123', 'email': 'test' }
+signup_error = { 'username': True, 'password': True, 'verify': True, 'email': True}
+login_valid = { 'username': 'test', 'password': 'test1234' }
+login_invalid = { 'username': '', 'password': '' }
 
 def template(template, **params):
     return jinja_env.get_template(template).render(params)
@@ -111,6 +102,4 @@ def test_get():
     valid_login = valid_login.follow()
     assert valid_login.body == template('user.html', username=login_valid['username'])
 
-
 test_get()
-	
