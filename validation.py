@@ -1,5 +1,4 @@
 import re
-import cgi
 
 USER_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")
 PASSWORD_RE = re.compile("^.{3,20}$")
