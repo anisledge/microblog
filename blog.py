@@ -1,19 +1,26 @@
-import webapp2 
+import webapp2
+import os
+import jinja2
+
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+	autoescape = True)
 
 class Handler(webapp2.RequestHandler):
-	def render(self, string):
-		self.response.out.write(string)
+	def render(self, template, **params):
+		t = jinja_env.get_template(template)
+		self.response.out.write(t.render(params))
 
 class Signup(Handler):
 	def get(self):
-		self.render('User signup')
+		self.render('signup.html')
 
 	def post(self):
 		pass
 
 class Login(Handler):
 	def get(self):
-		self.render('User login')
+		self.render('login.html')
 
 	def post(self):
 		pass
@@ -24,7 +31,7 @@ class Logout(Handler):
 
 class UserHandler(Handler):
 	def get(self):
-		self.render('User home')
+		self.render('user.html')
 
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
