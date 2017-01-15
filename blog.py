@@ -1,6 +1,7 @@
 import webapp2
 import os
 import jinja2
+from validation import detect_errors
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -16,7 +17,17 @@ class Signup(Handler):
 		self.render('signup.html')
 
 	def post(self):
-		pass
+		user_username = self.request.get('username')
+		user_password = self.request.get('password')
+		user_verify = self.request.get('verify')
+		user_email = self.request.get('email') 
+
+		error, valid = detect_errors(user_username, user_password, user_verify, user_email)
+		
+		if (valid): 
+			self.redirect("/user?username=%s" % user_username)
+		else:
+			self.render("signup.html", error=error, username=user_username, email=user_email)
 
 class Login(Handler):
 	def get(self):
@@ -31,7 +42,8 @@ class Logout(Handler):
 
 class UserHandler(Handler):
 	def get(self):
-		self.render('user.html')
+		username = self.request.get('username')
+		self.render('user.html', username=username)
 
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
