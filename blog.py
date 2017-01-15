@@ -1,11 +1,17 @@
 import webapp2
 import os
 import jinja2
+
 from validation import detect_errors
+from google.appengine.ext import db
+from model import User
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 	autoescape = True)
+
+def blog_key(name = 'default'):
+	return db.Key.from_path('blogs', name)
 
 class Handler(webapp2.RequestHandler):
 	def render(self, template, **params):
