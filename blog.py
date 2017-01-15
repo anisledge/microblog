@@ -3,6 +3,7 @@ import os
 import jinja2
 
 from validation import detect_errors
+from security import make_secure_val, check_secure_val, make_pw_hash, valid_pw
 from google.appengine.ext import db
 from model import User
 
@@ -31,6 +32,10 @@ class Signup(Handler):
 		error, valid = detect_errors(user_username, user_password, user_verify, user_email)
 		
 		if (valid): 
+			pw_hash = make_pw_hash(user_username, user_password, salt=None)
+			user = User(username=user_username, password=pw_hash, email=user_email, parent=blog_key())
+			user.put()
+
 			self.redirect("/user?username=%s" % user_username)
 		else:
 			self.render("signup.html", error=error, username=user_username, email=user_email)
