@@ -57,7 +57,7 @@ class Signup(Handler):
 			user_id = str(user.key().id())
 			self.session_cookie(user_id)
 
-			self.redirect("/user")
+			self.redirect("/user/%s" % str(user.key().id()))
 		else:
 			self.render("signup.html", error=error, username=user_username, email=user_email)
 
@@ -75,7 +75,7 @@ class Login(Handler):
 			if valid_pw(user_username, user_password, user.password):
 				user_id = str(user.key().id())
 				self.session_cookie(user_id)
-				self.redirect("/user")	
+				self.redirect("/user/%s" % str(user.key().id()))	
 				return
 		
 		self.render("login.html", error=True, username=user_username)
@@ -86,13 +86,13 @@ class Logout(Handler):
 		self.redirect('/signup')
 
 class UserHandler(Handler):
-	def get(self):
-		user = self.valid_user_cookie()
-		self.render('user.html', username=user.username)
+	def get(self, user_id):		
+		user = User.get_by_id(int(user_id), parent=blog_key())
+		self.render("user.html", username=user.username)
 
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
 							('/logout', Logout),
-							('/user', UserHandler),
+							('/user/([0-9]+)', UserHandler),
 							],
 							debug=True)
