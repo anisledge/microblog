@@ -6,26 +6,41 @@
 	<table>
 		<tr>
 			<td style="text-align:right">
-				<label>Username<input name="username" type="text"/></label>
+				<label>Username<input name="username" type="text" value="{{ username }}"/></label>
+			</td>
+			<td>{% if error and error.username %}
+					<b>That's not a valid username.</b>
+				{% endif %}
+				{% if error and error.username_exists %}
+					<b>That user already exists.</b>
+				{% endif %}
 			</td>
 		</tr>
 		<tr>
 			<td style="text-align:right">
 				<label>Password<input name="password" type="password"/></label>
 			</td>
+			<td>{% if error and error.password %}
+					<b>That wasn't a valid password.</b>
+				{% endif %}</td>
 		</tr>
 		<tr>
 			<td style="text-align:right">
 				<label>Verify Password<input name="verify" type="password"/></label>
 			</td>
+			<td>{% if error and error.verify %}
+				<b>Your passwords didn't match.</b>
+			{% endif %}</td>
 		</tr>
 		<tr>
 			<td style="text-align:right">
-				<label>Email(optional)<input name="email" type="text"/></label>
+				<label>Email(optional)<input name="email" type="text" value="{{ email }}"/></label>
 			</td>
+			<td>{% if error and error.email %}
+				<b>That's not a valid email.</b>
+			{% endif %}</td>
 		</tr>
 	</table>
-
 	<input type="submit" />
 </form>
 <p><a href="/login">Login</a></p>
