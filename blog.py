@@ -19,6 +19,15 @@ class Handler(webapp2.RequestHandler):
 		t = jinja_env.get_template(template)
 		self.response.out.write(t.render(params))
 
+	def valid_user_cookie(self):
+		user_id_str = self.request.cookies.get('user_id')
+		
+		if user_id_str: 
+			valid_id = check_secure_val(user_id_str)
+			
+			if valid_id:
+				return User.get_by_id(int(valid_id), parent=blog_key())
+
 class Signup(Handler):
 	def get(self):
 		self.render('signup.html')
@@ -31,8 +40,7 @@ class Signup(Handler):
  
 		error, valid = detect_errors(user_username, user_password, user_verify, user_email)
 		
-		q = User.gql("WHERE username = '" + user_username + "'")
-		user = q.get()
+		user = User.gql("WHERE username = '" + user_username + "'").get()
 		
 		if (user):
 			error["username_exists"], valid = True, False
@@ -42,7 +50,11 @@ class Signup(Handler):
 			user = User(username=user_username, password=pw_hash, email=user_email, parent=blog_key())
 			user.put()
 
-			self.redirect("/user?username=%s" % user_username)
+			user_id = str(user.key().id())
+			user_hash = make_secure_val(user_id)
+			self.response.headers.add_header('Set-Cookie', 'user_id=' + user_hash)
+
+			self.redirect("/user")
 		else:
 			self.render("signup.html", error=error, username=user_username, email=user_email)
 
@@ -65,8 +77,8 @@ class Logout(Handler):
 
 class UserHandler(Handler):
 	def get(self):
-		username = self.request.get('username')
-		self.render('user.html', username=username)
+		user = self.valid_user_cookie()
+		self.render('user.html', username=user.username)
 
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
