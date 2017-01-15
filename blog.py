@@ -27,7 +27,7 @@ class Login(Handler):
 
 class Logout(Handler):
 	def get(self):
-		self.render('User logout')
+		self.redirect('/signup')
 
 class UserHandler(Handler):
 	def get(self):
