@@ -21,7 +21,7 @@ class Signup(Handler):
 		user_password = self.request.get('password')
 		user_verify = self.request.get('verify')
 		user_email = self.request.get('email') 
-
+ 
 		error, valid = detect_errors(user_username, user_password, user_verify, user_email)
 		
 		if (valid): 
@@ -34,7 +34,13 @@ class Login(Handler):
 		self.render('login.html')
 
 	def post(self):
-		pass
+		user_username = self.request.get('username')
+		user_password = self.request.get('password')
+		
+		if (user_username and user_password):
+			self.redirect("/user?username=%s" % user_username)
+		else:
+			self.render("login.html", error=True, username=user_username)
 
 class Logout(Handler):
 	def get(self):
