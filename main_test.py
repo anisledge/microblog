@@ -13,14 +13,28 @@
 # limitations under the License.
 
 import webtest
-
-import main
+import blog
 
 
 def test_get():
-    app = webtest.TestApp(main.app)
+    app = webtest.TestApp(blog.app)
 
-    response = app.get('/')
+    #USER ROUTING
+    signup = app.get('/signup')
+    assert signup.status_int == 200
+    assert signup.body == 'User signup'
 
-    assert response.status_int == 200
-    assert response.body == 'Hello, World!'
+    login = app.get('/login')
+    assert login.status_int == 200
+    assert login.body == 'User login'
+
+    logout = app.get('/logout')
+    assert logout.status_int == 200
+    assert logout.body == 'User logout'
+    
+    user = app.get('/user')
+    assert user.status_int == 200
+    assert user.body == 'User home'
+	
+test_get()
+	
