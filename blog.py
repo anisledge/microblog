@@ -19,6 +19,10 @@ class Handler(webapp2.RequestHandler):
 		t = jinja_env.get_template(template)
 		self.response.out.write(t.render(params))
 
+	def session_cookie(self, user_id):
+		user_hash = make_secure_val(user_id)
+		self.response.headers.add_header('Set-Cookie', 'user_id=' + user_hash)
+
 	def valid_user_cookie(self):
 		user_id_str = self.request.cookies.get('user_id')
 		
@@ -51,8 +55,7 @@ class Signup(Handler):
 			user.put()
 
 			user_id = str(user.key().id())
-			user_hash = make_secure_val(user_id)
-			self.response.headers.add_header('Set-Cookie', 'user_id=' + user_hash)
+			self.session_cookie(user_id)
 
 			self.redirect("/user")
 		else:
@@ -65,11 +68,17 @@ class Login(Handler):
 	def post(self):
 		user_username = self.request.get('username')
 		user_password = self.request.get('password')
+
+		user = User.gql("WHERE username = '" + user_username + "'").get()
 		
-		if (user_username and user_password):
-			self.redirect("/user?username=%s" % user_username)
-		else:
-			self.render("login.html", error=True, username=user_username)
+		if user: 
+			if valid_pw(user_username, user_password, user.password):
+				user_id = str(user.key().id())
+				self.session_cookie(user_id)
+				self.redirect("/user")	
+				return
+		
+		self.render("login.html", error=True, username=user_username)
 
 class Logout(Handler):
 	def get(self):
