@@ -14,7 +14,15 @@
 
 import webtest
 import blog
+import os
+import jinja2
 
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+    autoescape = True)
+
+def template(template, **params):
+    return jinja_env.get_template(template).render(params)
 
 def test_get():
     app = webtest.TestApp(blog.app)
@@ -22,19 +30,20 @@ def test_get():
     #USER ROUTING
     signup = app.get('/signup')
     assert signup.status_int == 200
-    assert signup.body == 'User signup'
+    assert signup.body == template('signup.html')
 
     login = app.get('/login')
     assert login.status_int == 200
-    assert login.body == 'User login'
+    assert login.body == template('login.html')
 
     logout = app.get('/logout')
-    assert logout.status_int == 200
-    assert logout.body == 'User logout'
+    assert logout.status_int == 302
+    logout = logout.follow()
+    assert logout.body == template('signup.html')
     
     user = app.get('/user')
     assert user.status_int == 200
-    assert user.body == 'User home'
+    assert user.body == template('user.html')
 	
 test_get()
 	
