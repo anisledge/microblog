@@ -31,6 +31,12 @@ class Signup(Handler):
  
 		error, valid = detect_errors(user_username, user_password, user_verify, user_email)
 		
+		q = User.gql("WHERE username = '" + user_username + "'")
+		user = q.get()
+		
+		if (user):
+			error["username_exists"], valid = True, False
+
 		if (valid): 
 			pw_hash = make_pw_hash(user_username, user_password, salt=None)
 			user = User(username=user_username, password=pw_hash, email=user_email, parent=blog_key())
