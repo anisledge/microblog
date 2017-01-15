@@ -87,6 +87,30 @@ def test_get():
     assert valid_signup.body == template('user.html', username=signup_valid['username'])
 
     #LOGIN FORM
+    login_form = login.form
+    assert login_form.method == 'POST'
+
+    #INVALID
+    login_form['username'] = login_invalid['username']
+    login_form['password'] = login_invalid['password']
+    invalid_login = login_form.submit()
+
+    error_form = template('login.html', error=True, username=login_invalid['username'])
+    assert invalid_login.body == error_form
+
+    login_form = invalid_login.form
+    assert login_form['username'].value == login_invalid['username']
+    assert login_form['password'].value == ""
+    
+    #VALID
+    login_form['username'] = login_valid['username']
+    login_form['password'] = login_valid['password']
+    valid_login = login_form.submit()
+    
+    assert valid_login.status_int == 302
+    valid_login = valid_login.follow()
+    assert valid_login.body == template('user.html', username=login_valid['username'])
+
 
 test_get()
 	
