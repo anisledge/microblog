@@ -1,7 +1,10 @@
 #Avoid import errors: add google directories to the path
 import sys
+import os
 sys.path.insert(1, "/Users/Ani/Downloads/google-cloud-sdk/lib/third_party")
 sys.path.insert(1, "/Users/Ani/Downloads/google-cloud-sdk/platform/google_appengine")
+sys.path.insert(1, "/Users/Ani/Downloads/google-cloud-sdk/platform/google_appengine")
+sys.path.insert(0, os.path.join('..', os.path.dirname(__file__)))
 
 #Import necessary files for testing
 from google.appengine.ext import testbed
@@ -11,9 +14,8 @@ import webtest
 import blog
 
 #Setup jinja2 templates
-import os
 import jinja2
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+template_dir = os.path.join('..', os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
    autoescape = True)
 
