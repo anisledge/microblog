@@ -92,25 +92,25 @@ class UserHandler(Handler):
 
 class PostHandler(Handler):
 	def get(self, post_id):
-		self.response.out.write("Shows a single blog post")
+		self.render('post/post.html')
 
 class CreatePostHandler(Handler):
 	def get(self):
-		self.response.out.write("Has form to create a post")
+		self.render('post/new.html')
 
 	def post(self):
 		pass
 
 class EditPostHandler(Handler):
 	def get(self, post_id):
-		self.response.out.write("Has form to edit a post")
+		self.render('post/edit.html')
 
 	def post(self, post_id):
 		pass
 
 class DeletePostHandler(Handler):
 	def get(self, post_id):
-		self.response.out.write("Has form to delete a post")
+		self.render('post/delete.html')
 
 	def post(self, post_id):
 		pass
