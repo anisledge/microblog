@@ -34,7 +34,7 @@ class Handler(webapp2.RequestHandler):
 
 class Signup(Handler):
 	def get(self):
-		self.render('signup.html')
+		self.render('user/signup.html')
 
 	def post(self):
 		user_username = self.request.get('username')
@@ -59,11 +59,11 @@ class Signup(Handler):
 
 			self.redirect("/user/%s" % str(user.key().id()))
 		else:
-			self.render("signup.html", error=error, username=user_username, email=user_email)
+			self.render("user/signup.html", error=error, username=user_username, email=user_email)
 
 class Login(Handler):
 	def get(self):
-		self.render('login.html')
+		self.render('user/login.html')
 
 	def post(self):
 		user_username = self.request.get('username')
@@ -78,7 +78,7 @@ class Login(Handler):
 				self.redirect("/user/%s" % str(user.key().id()))	
 				return
 		
-		self.render("login.html", error=True, username=user_username)
+		self.render("user/login.html", error=True, username=user_username)
 
 class Logout(Handler):
 	def get(self):
@@ -88,7 +88,7 @@ class Logout(Handler):
 class UserHandler(Handler):
 	def get(self, user_id):		
 		user = User.get_by_id(int(user_id), parent=blog_key())
-		self.render("user.html", username=user.username)
+		self.render("user/user.html", username=user.username)
 
 class PostHandler(Handler):
 	def get(self, post_id):
