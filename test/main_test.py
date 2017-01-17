@@ -140,5 +140,25 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('user.html', username='test1'))
 
+    def test_post_handler(self):
+        response = self.testapp.get('/post/' + '1')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.body, "Shows a single blog post")
+
+    def test_create_post_handler(self):
+        response = self.testapp.get('/post/new')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.body, "Has form to create a post")
+
+    def test_edit_post_handler(self):
+        response = self.testapp.get('/post/' + '1' + '/edit')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.body, "Has form to edit a post")
+
+    def test_delete_post_handler(self):
+        response = self.testapp.get('/post/' + '1' + '/delete')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.body, "Has form to delete a post")
+
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
 unittest.TextTestRunner(verbosity=2).run(suite)
