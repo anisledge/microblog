@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% if post %}
+	<div class="blog-post">
+		<h2 class="post-heading">{{ post.subject }} 
+			<small class="post-date">
+				<a href="/user/{{ post.author.key().id() }}">{{ post.author.username }}</a>
+				{{ post.created.strftime("%B") }} {{ post.created.day }}, {{ post.created.year }}
+				</small>
+		</h2>
+		
+		<pre>{{ post.content }}</pre>
+	</div> 
+	<p>
+		<a href="#">Edit</a>
+		<a href="#">Delete</a>
+	</p>
+	{% else %}
+		<p>Sorry, the post was not found.</p>
+	{% endif %}
+{% endblock %}
