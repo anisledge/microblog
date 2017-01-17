@@ -123,7 +123,9 @@ class EditPostHandler(Handler):
 		
 class DeletePostHandler(Handler):
 	def get(self, post_id):
-		self.render('post/delete.html')
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+
+		self.render("post/delete.html", post=post)
 
 	def post(self, post_id):
 		pass
