@@ -1,5 +1,5 @@
 import webapp2
-import os
+import os 
 import jinja2
 
 from validation import detect_errors
@@ -90,9 +90,38 @@ class UserHandler(Handler):
 		user = User.get_by_id(int(user_id), parent=blog_key())
 		self.render("user.html", username=user.username)
 
+class PostHandler(Handler):
+	def get(self, post_id):
+		self.response.out.write("Shows a single blog post")
+
+class CreatePostHandler(Handler):
+	def get(self):
+		self.response.out.write("Has form to create a post")
+
+	def post(self):
+		pass
+
+class EditPostHandler(Handler):
+	def get(self, post_id):
+		self.response.out.write("Has form to edit a post")
+
+	def post(self, post_id):
+		pass
+
+class DeletePostHandler(Handler):
+	def get(self, post_id):
+		self.response.out.write("Has form to delete a post")
+
+	def post(self, post_id):
+		pass
+
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
 							('/logout', Logout),
 							('/user/([0-9]+)', UserHandler),
+							('/post/([0-9]+)', PostHandler),
+							('/post/new', CreatePostHandler),
+							('/post/([0-9]+)/edit', EditPostHandler),
+							('/post/([0-9]+)/delete', DeletePostHandler),
 							],
 							debug=True)
