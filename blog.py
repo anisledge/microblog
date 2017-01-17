@@ -93,7 +93,7 @@ class Logout(Handler):
 class UserHandler(Handler):
 	def get(self, user_id):		
 		user = User.get_by_id(int(user_id), parent=blog_key())
-		self.render("user/user.html", username=user.username)
+		self.render("user/user.html", user=user)
 
 class PostHandler(Handler):
 	def get(self, post_id):

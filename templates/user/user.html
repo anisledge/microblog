@@ -1,7 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<h2>{{ user.username }}</h2>
 
-	<p>Welcome, {{ username }}!</p>
+	{% if not user.posts[0] %}
+	<p>This user has no posts yet.</p>
+	{% endif %}
+
+	{% for post in user.posts %}
+	<div class="blog-post">
+		<h2 class="post-heading">
+			<a href="/post/{{ post.key().id() }}">{{ post.subject }}</a> 
+			<small class="post-date">
+				<a href="/user/{{ user.key().id() }}">{{ user.username }}</a>
+				{{ post.created.strftime("%B") }} {{ post.created.day }}, {{ post.created.year }}
+				</small> 
+		</h2>
+		
+		<pre>{{ post.content }}</pre>
+	</div> 
+	<p>
+		<a href="/post/{{ post.key().id() }}/edit">Edit</a>
+		<a href="/post/{{ post.key().id() }}/delete">Delete</a>
+	</p>
+	{% endfor %}
 
 {% endblock %}
