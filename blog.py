@@ -1,11 +1,11 @@
-import webapp2
+import webapp2 
 import os 
 import jinja2
 
 from validation import detect_errors
 from security import make_secure_val, check_secure_val, make_pw_hash, valid_pw
 from google.appengine.ext import db
-from model import User
+from model import User, Post
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -99,7 +99,16 @@ class CreatePostHandler(Handler):
 		self.render('post/new.html')
 
 	def post(self):
-		pass
+		user = self.valid_user_cookie()
+
+		subject = self.request.get("subject")
+		content = self.request.get("content")
+		if subject and content:
+			b = Post(subject=subject, content=content, author=user, parent=blog_key())
+			b.put()
+			self.redirect("/post/%s" % str(b.key().id()))
+		else:
+			self.render("post/new.html")
 
 class EditPostHandler(Handler):
 	def get(self, post_id):
