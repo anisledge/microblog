@@ -3,7 +3,8 @@
 {% block content %}
 	{% if post %}
 	<div class="blog-post">
-		<h2 class="post-heading">{{ post.subject }} 
+		<h2 class="post-heading">
+			<a href="/post/{{ post.key().id() }}">{{ post.subject }}</a> 
 			<small class="post-date">
 				<a href="/user/{{ post.author.key().id() }}">{{ post.author.username }}</a>
 				{{ post.created.strftime("%B") }} {{ post.created.day }}, {{ post.created.year }}
@@ -18,7 +19,7 @@
 			<input type="submit" value="Delete"/>
 		</form>
 	</div>
-	<a href="#">Cancel</a>
+	<a href="/post/{{ post.key().id() }}">Cancel</a>
 	{% else %}
 		<p>Sorry, the post was not found.</p>
 	{% endif %}
