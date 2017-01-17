@@ -44,7 +44,7 @@ class AppTest(unittest.TestCase):
     def test_signup_handler(self):
         response = self.testapp.get('/signup')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('signup.html'))
+        self.assertEqual(response.body, template('user/signup.html'))
 
     def test_signup_valid(self):
         response = self.testapp.get('/signup')
@@ -64,7 +64,7 @@ class AppTest(unittest.TestCase):
         valid_signup = form.submit()
         self.assertEqual(valid_signup.status_int, 302)
         valid_signup = valid_signup.follow()
-        self.assertEqual(valid_signup.body, template('user.html', username=valid_input['username']))
+        self.assertEqual(valid_signup.body, template('user/user.html', username=valid_input['username']))
 
     def test_signup_invalid(self):
         response = self.testapp.get('/signup')
@@ -85,7 +85,7 @@ class AppTest(unittest.TestCase):
 
         error = { 'username': True, 'password': True, 'verify': True, 'email': True}
 
-        error_form = template("signup.html", error=error, username=invalid_input['username'], email=invalid_input['email'])
+        error_form = template("user/signup.html", error=error, username=invalid_input['username'], email=invalid_input['email'])
         self.assertEqual(invalid_signup.body, error_form)
         
         form = invalid_signup.form
@@ -97,7 +97,7 @@ class AppTest(unittest.TestCase):
     def test_login_handler(self):
         response = self.testapp.get('/login')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('login.html'))
+        self.assertEqual(response.body, template('user/login.html'))
 
     def test_login_valid(self):
         response = self.testapp.get('/login')
@@ -110,7 +110,7 @@ class AppTest(unittest.TestCase):
         valid_login = form.submit()
         self.assertEqual(valid_login.status_int, 302)
         valid_login = valid_login.follow()
-        self.assertEqual(valid_login.body, template('user.html', username=self.user.username))
+        self.assertEqual(valid_login.body, template('user/user.html', username=self.user.username))
 
     def test_login_invalid(self):
         response = self.testapp.get('/login')
@@ -122,7 +122,7 @@ class AppTest(unittest.TestCase):
         
         invalid_login = form.submit()
 
-        error_form = template('login.html', error=True, username="nope")
+        error_form = template('user/login.html', error=True, username="nope")
         self.assertEqual(invalid_login.body, error_form)
 
         form = invalid_login.form
@@ -133,32 +133,32 @@ class AppTest(unittest.TestCase):
         response = self.testapp.get('/logout')
         self.assertEqual(response.status_int, 302)
         response = response.follow()
-        self.assertEqual(response.body, template('signup.html'))
+        self.assertEqual(response.body, template('user/signup.html'))
 
     def test_user_handler(self):
         response = self.testapp.get('/user/' + self.user_id)
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('user.html', username='test1'))
+        self.assertEqual(response.body, template('user/user.html', username='test1'))
 
     def test_post_handler(self):
         response = self.testapp.get('/post/' + '1')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Shows a single blog post")
+        self.assertEqual(response.body, template('post/post.html'))
 
     def test_create_post_handler(self):
         response = self.testapp.get('/post/new')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Has form to create a post")
+        self.assertEqual(response.body, template('post/new.html'))
 
     def test_edit_post_handler(self):
         response = self.testapp.get('/post/' + '1' + '/edit')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Has form to edit a post")
+        self.assertEqual(response.body, template('post/edit.html'))
 
     def test_delete_post_handler(self):
         response = self.testapp.get('/post/' + '1' + '/delete')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Has form to delete a post")
+        self.assertEqual(response.body, template('post/delete.html'))
 
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
 unittest.TextTestRunner(verbosity=2).run(suite)
