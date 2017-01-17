@@ -119,8 +119,19 @@ class EditPostHandler(Handler):
 		self.render('post/edit.html', post=post)
 
 	def post(self, post_id):
-		pass
+		user = self.valid_user_cookie()
+		post = Post.get_by_id(int(post_id), parent=blog_key())
 		
+		subject = self.request.get("subject")
+		content = self.request.get("content")
+		if subject and content:
+			post.subject = subject
+			post.content = content
+			post.put()
+			self.redirect('/post/%s' % post_id)
+		else:
+			self.render("post/edit.html", post=post)
+	
 class DeletePostHandler(Handler):
 	def get(self, post_id):
 		post = Post.get_by_id(int(post_id), parent=blog_key())
