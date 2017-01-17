@@ -139,7 +139,9 @@ class DeletePostHandler(Handler):
 		self.render("post/delete.html", post=post)
 
 	def post(self, post_id):
-		pass
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		post.delete()
+		self.redirect('/')
 
 app = webapp2.WSGIApplication([('/signup', Signup),
 							('/login', Login),
