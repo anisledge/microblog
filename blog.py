@@ -32,6 +32,11 @@ class Handler(webapp2.RequestHandler):
 			if valid_id:
 				return User.get_by_id(int(valid_id), parent=blog_key())
 
+class IndexHandler(Handler):
+	def get(self):
+		posts = db.GqlQuery('SELECT * FROM Post ORDER BY created DESC')
+		self.render("index.html", posts=posts)
+
 class Signup(Handler):
 	def get(self):
 		self.render('user/signup.html')
@@ -143,7 +148,8 @@ class DeletePostHandler(Handler):
 		post.delete()
 		self.redirect('/')
 
-app = webapp2.WSGIApplication([('/signup', Signup),
+app = webapp2.WSGIApplication([('/', IndexHandler),
+							('/signup', Signup),
 							('/login', Login),
 							('/logout', Logout),
 							('/user/([0-9]+)', UserHandler),
