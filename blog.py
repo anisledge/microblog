@@ -92,7 +92,9 @@ class UserHandler(Handler):
 
 class PostHandler(Handler):
 	def get(self, post_id):
-		self.render('post/post.html')
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+
+		self.render("post/post.html", post=post)
 
 class CreatePostHandler(Handler):
 	def get(self):
