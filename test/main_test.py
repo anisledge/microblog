@@ -37,6 +37,10 @@ class AppTest(unittest.TestCase):
         self.user = user
         self.user_id = str(self.user.key().id())
         self.password = 'password'
+
+        self.post = blog.Post(subject="test", content="test", author=user, parent=blog.blog_key())
+        self.post.put()
+        self.post_id = str(self.post.key().id())
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -145,24 +149,77 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.body, template('user/user.html', user=user))
 
     def test_post_handler(self):
-        response = self.testapp.get('/post/' + '1')
+        response = self.testapp.get('/post/' + self.post_id)
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('post/post.html'))
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
 
     def test_create_post_handler(self):
         response = self.testapp.get('/post/new')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('post/new.html'))
 
+    def test_create_post_valid(self):
+        response = self.testapp.get('/post/new')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+
+        form['subject'] = 'testCreate'
+        form['content'] = 'testCreate'
+
+        valid_create = form.submit()
+        self.assertEqual(valid_create.status_int, 302)
+
+    def test_create_post_invalid(self):
+        response = self.testapp.get('/post/new')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+
+        form['subject'] = ''
+        form['content'] = 'Nope'
+
+        invalid_create = form.submit()
+        self.assertEqual(invalid_create.status_int, 200)
+
+        self.assertEqual(invalid_create.body, template('post/new.html', subject="", blog_content="Nope", error=True))
+        self.assertEqual(form['subject'].value, "")
+        self.assertEqual(form['content'].value, "Nope")
+
     def test_edit_post_handler(self):
-        response = self.testapp.get('/post/' + '1' + '/edit')
+        response = self.testapp.get('/post/' + self.post_id + '/edit')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('post/edit.html'))
+        self.assertEqual(response.body, template('post/edit.html', post=self.post))
+
+    def test_edit_post_valid(self):
+        response = self.testapp.get('/post/' + self.post_id + '/edit')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+
+        form['subject'] = 'NewSubject'
+        form['content'] = 'NewContent'
+
+        valid_edit = form.submit()
+        self.assertEqual(valid_edit.status_int, 302)
+
+    def test_edit_post_invalid(self):
+        response = self.testapp.get('/post/' + self.post_id + '/edit')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+
+        form['subject'] = ''
+        form['content'] = ''
+
+        invalid_edit = form.submit()
+        self.assertEqual(invalid_edit.status_int, 200)
+        
+        form = invalid_edit.form
+        self.assertEqual(invalid_edit.body, template('post/edit.html', post=self.post, error=True))
+        self.assertEqual(form['subject'].value, self.post.subject)
+        self.assertEqual(form['content'].value, self.post.content)
 
     def test_delete_post_handler(self):
-        response = self.testapp.get('/post/' + '1' + '/delete')
+        response = self.testapp.get('/post/' + self.post_id + '/delete')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('post/delete.html'))
+        self.assertEqual(response.body, template('post/delete.html', post=self.post))
 
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
 unittest.TextTestRunner(verbosity=2).run(suite)
