@@ -115,7 +115,7 @@ class CreatePostHandler(Handler):
 			b.put()
 			self.redirect("/post/%s" % str(b.key().id()))
 		else:
-			self.render("post/new.html")
+			self.render("post/new.html", subject=subject, blog_content=content, error=True)
 
 class EditPostHandler(Handler):
 	def get(self, post_id):
@@ -134,8 +134,8 @@ class EditPostHandler(Handler):
 			post.content = content
 			post.put()
 			self.redirect('/post/%s' % post_id)
-		else:
-			self.render("post/edit.html", post=post)
+		else: 
+			self.render("post/edit.html", post=post, error=True)
 	
 class DeletePostHandler(Handler):
 	def get(self, post_id):
