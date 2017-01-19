@@ -51,7 +51,7 @@ class AppTest(unittest.TestCase):
         form = response.form
         self.assertEqual(form.method, 'POST')
 
-        valid_input = { 'username': 'test', 
+        valid_input = { 'username': 'test2', 
                         'password': 'test1234', 
                         'verify': 'test1234', 
                         'email': 'test@test.com'}
@@ -64,7 +64,9 @@ class AppTest(unittest.TestCase):
         valid_signup = form.submit()
         self.assertEqual(valid_signup.status_int, 302)
         valid_signup = valid_signup.follow()
-        self.assertEqual(valid_signup.body, template('user/user.html', username=valid_input['username']))
+
+        user = blog.User.gql("WHERE username = 'test2'").get()
+        self.assertEqual(valid_signup.body, template('user/user.html', user=user))
 
     def test_signup_invalid(self):
         response = self.testapp.get('/signup')
@@ -110,7 +112,7 @@ class AppTest(unittest.TestCase):
         valid_login = form.submit()
         self.assertEqual(valid_login.status_int, 302)
         valid_login = valid_login.follow()
-        self.assertEqual(valid_login.body, template('user/user.html', username=self.user.username))
+        self.assertEqual(valid_login.body, template('user/user.html', user=self.user))
 
     def test_login_invalid(self):
         response = self.testapp.get('/login')
@@ -138,7 +140,9 @@ class AppTest(unittest.TestCase):
     def test_user_handler(self):
         response = self.testapp.get('/user/' + self.user_id)
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, template('user/user.html', username='test1'))
+
+        user = blog.User.get_by_id(int(self.user_id), parent=blog.blog_key())
+        self.assertEqual(response.body, template('user/user.html', user=user))
 
     def test_post_handler(self):
         response = self.testapp.get('/post/' + '1')
