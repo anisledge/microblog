@@ -6,12 +6,15 @@
 	<form method="POST">
 		<label>
 			<div>Subject</div>
-			<input type="text" name="subject"/>
+			<input type="text" name="subject" value="{{ subject }}"/>
 		</label>
 		<label>
 			<div>Blog</div>
-			<textarea name="content"></textarea>
+			<textarea name="content">{{ blog_content }}</textarea>
 		</label>
+		{% if error %}
+		<div class="error">Subject and content, please!</div>
+		{% endif %}
 		<div>
 			<input type="submit" />
 		</div>

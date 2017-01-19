@@ -13,6 +13,9 @@
 			<div>Blog</div>
 			<textarea name="content">{{ post.content }}</textarea>
 		</label>
+		{% if error %}
+		<div class="error">Subject and content, please!</div>
+		{% endif %}
 		<div>
 			<input type="submit" />
 		</div>
