@@ -40,7 +40,7 @@ class IndexHandler(Handler):
 class Signup(Handler):
 	def get(self):
 		self.render('user/signup.html')
-
+ 
 	def post(self):
 		user_username = self.request.get('username')
 		user_password = self.request.get('password')
@@ -103,10 +103,18 @@ class PostHandler(Handler):
 
 class CreatePostHandler(Handler):
 	def get(self):
+		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
+		
 		self.render('post/new.html')
 
 	def post(self):
 		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
 
 		subject = self.request.get("subject")
 		content = self.request.get("content")
@@ -119,12 +127,21 @@ class CreatePostHandler(Handler):
 
 class EditPostHandler(Handler):
 	def get(self, post_id):
+		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
+		
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 
 		self.render('post/edit.html', post=post)
 
 	def post(self, post_id):
 		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
+
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 		
 		subject = self.request.get("subject")
@@ -139,11 +156,21 @@ class EditPostHandler(Handler):
 	
 class DeletePostHandler(Handler):
 	def get(self, post_id):
+		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
+		
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 
 		self.render("post/delete.html", post=post)
 
 	def post(self, post_id):
+		user = self.valid_user_cookie()
+		if not bool(user):
+			self.redirect('/signup')
+			return
+
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 		post.delete()
 		self.redirect('/')
