@@ -45,6 +45,14 @@ class AppTest(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
+    def login(self):
+        response = self.testapp.get('/login')
+        form = response.form
+        form['username'] = self.user.username
+        form['password'] = self.password
+        valid_login = form.submit()
+        valid_login.follow()
+
     def test_signup_handler(self):
         response = self.testapp.get('/signup')
         self.assertEqual(response.status_int, 200)
@@ -152,13 +160,35 @@ class AppTest(unittest.TestCase):
         response = self.testapp.get('/post/' + self.post_id)
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('post/post.html', post=self.post))
+    
+    def test_create_post_handler_unauth(self):
+        response = self.testapp.get('/post/new')
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.body, template('user/signup.html'))
 
+    def test_edit_post_handler_unauth(self):
+        response = self.testapp.get('/post/' + self.post_id + '/edit')
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.body, template('user/signup.html'))
+
+    def test_delete_post_handler_unauth(self):
+        response = self.testapp.get('/post/' + self.post_id + '/delete')
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.body, template('user/signup.html'))
+    
     def test_create_post_handler(self):
+        self.login()
+
         response = self.testapp.get('/post/new')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('post/new.html'))
 
     def test_create_post_valid(self):
+        self.login()
+
         response = self.testapp.get('/post/new')
         form = response.form
         self.assertEqual(form.method, 'POST')
@@ -170,6 +200,8 @@ class AppTest(unittest.TestCase):
         self.assertEqual(valid_create.status_int, 302)
 
     def test_create_post_invalid(self):
+        self.login()
+
         response = self.testapp.get('/post/new')
         form = response.form
         self.assertEqual(form.method, 'POST')
@@ -185,11 +217,15 @@ class AppTest(unittest.TestCase):
         self.assertEqual(form['content'].value, "Nope")
 
     def test_edit_post_handler(self):
+        self.login()
+
         response = self.testapp.get('/post/' + self.post_id + '/edit')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('post/edit.html', post=self.post))
 
     def test_edit_post_valid(self):
+        self.login()
+
         response = self.testapp.get('/post/' + self.post_id + '/edit')
         form = response.form
         self.assertEqual(form.method, 'POST')
@@ -201,6 +237,8 @@ class AppTest(unittest.TestCase):
         self.assertEqual(valid_edit.status_int, 302)
 
     def test_edit_post_invalid(self):
+        self.login()
+
         response = self.testapp.get('/post/' + self.post_id + '/edit')
         form = response.form
         self.assertEqual(form.method, 'POST')
@@ -217,6 +255,8 @@ class AppTest(unittest.TestCase):
         self.assertEqual(form['content'].value, self.post.content)
 
     def test_delete_post_handler(self):
+        self.login()
+        
         response = self.testapp.get('/post/' + self.post_id + '/delete')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('post/delete.html', post=self.post))
