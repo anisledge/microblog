@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-
+ 
 class User(db.Model):
 	username = db.StringProperty(required = True)
 	password = db.StringProperty(required = True)
@@ -12,3 +12,7 @@ class Post(db.Model):
 	last_modified = db.DateTimeProperty(auto_now = True)
 
 	author = db.ReferenceProperty(User, collection_name='posts')
+
+class Like(db.Model):
+	author = db.ReferenceProperty(User, collection_name='likes')
+	post = db.ReferenceProperty(Post, collection_name='likes')
