@@ -189,7 +189,8 @@ class UnlikeHandler(Handler):
 		user = self.valid_user_cookie()
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 		like = Like.gql("WHERE author = :author AND post = :post", author = user, post = post).get()
-		like.delete()
+		if like:
+			like.delete()
 		self.redirect('/post/%s' % post_id)
 
 app = webapp2.WSGIApplication([('/', IndexHandler),
