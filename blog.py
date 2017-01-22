@@ -5,7 +5,7 @@ import jinja2
 from validation import detect_errors
 from security import make_secure_val, check_secure_val, make_pw_hash, valid_pw
 from google.appengine.ext import db
-from model import User, Post
+from model import User, Post, Like
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
