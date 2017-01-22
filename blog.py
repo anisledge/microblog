@@ -176,6 +176,14 @@ class DeletePostHandler(Handler):
 		post.delete()
 		self.redirect('/')
 
+class LikeHandler(Handler):
+	def post(self, post_id):
+		self.response.out.write("Allows users to like post %s" % post_id)
+
+class UnlikeHandler(Handler):
+	def post(self, post_id):
+		self.response.out.write("Allows users to unlike post %s" % post_id)
+
 app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/signup', Signup),
 							('/login', Login),
@@ -185,5 +193,7 @@ app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/post/new', CreatePostHandler),
 							('/post/([0-9]+)/edit', EditPostHandler),
 							('/post/([0-9]+)/delete', DeletePostHandler),
+							('/post/([0-9]+)/like', LikeHandler),
+							('/post/([0-9]+)/unlike', UnlikeHandler),
 							],
 							debug=True)
