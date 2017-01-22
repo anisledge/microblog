@@ -11,7 +11,7 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 	autoescape = True)
 
-def blog_key(name = 'default'):
+def blog_key(name = 'default'): 
 	return db.Key.from_path('blogs', name)
 
 class Handler(webapp2.RequestHandler):
@@ -178,6 +178,10 @@ class DeletePostHandler(Handler):
 
 class LikeHandler(Handler):
 	def post(self, post_id):
+		user = self.valid_user_cookie()
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		like = Like(post=post, author=user, parent=blog_key())
+		like.put()
 		self.response.out.write("Allows users to like post %s" % post_id)
 
 class UnlikeHandler(Handler):
