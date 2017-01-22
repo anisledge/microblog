@@ -18,6 +18,13 @@
 		<a href="/post/{{ post.key().id() }}/edit">Edit</a>
 		<a href="/post/{{ post.key().id() }}/delete">Delete</a>
 	</p>
+	<form method="post" action="/post/{{ post.key().id() }}/like">
+		<input type="submit" value="Like"/>
+	</form>
+	<form method="post" action="/post/{{ post.key().id() }}/unlike">
+		<input type="submit" value="Unlike"/>
+	</form>
+	<p>{{ post.likes.count() }} Likes</p>
 	{% else %}
 		<p>Sorry, the post was not found.</p>
 	{% endif %}
