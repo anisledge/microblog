@@ -186,6 +186,10 @@ class LikeHandler(Handler):
 
 class UnlikeHandler(Handler):
 	def post(self, post_id):
+		user = self.valid_user_cookie()
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		like = Like.gql("WHERE author = :author AND post = :post", author = user, post = post).get()
+		like.delete()
 		self.response.out.write("Allows users to unlike post %s" % post_id)
 
 app = webapp2.WSGIApplication([('/', IndexHandler),
