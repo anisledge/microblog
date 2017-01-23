@@ -41,6 +41,9 @@ class AppTest(unittest.TestCase):
         self.post = blog.Post(subject="test", content="test", author=user, parent=blog.blog_key())
         self.post.put()
         self.post_id = str(self.post.key().id())
+
+        like = blog.Like(post=self.post, author=self.user, parent=blog.blog_key())
+        like.put()
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -54,14 +57,27 @@ class AppTest(unittest.TestCase):
         valid_login.follow()
     
     def test_like_handler(self):
+        self.login()
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
+        
         response = self.testapp.post('/post/' + self.post_id + '/like')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Allows users to like post %s" % self.post_id)
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
+        
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 2)
 
     def test_unlike_handler(self):
+        self.login()
+
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
+        
         response = self.testapp.post('/post/' + self.post_id + '/unlike')
-        self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Allows users to unlike post %s" % self.post_id)
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
+        
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 0)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
 unittest.TextTestRunner(verbosity=2).run(suite)
