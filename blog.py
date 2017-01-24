@@ -6,7 +6,7 @@ from validation import detect_errors
 from security import make_secure_val, check_secure_val, make_pw_hash, valid_pw
 from google.appengine.ext import db
 from model import User, Post, Like
-
+ 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 	autoescape = True)
@@ -180,8 +180,10 @@ class LikeHandler(Handler):
 	def post(self, post_id):
 		user = self.valid_user_cookie()
 		post = Post.get_by_id(int(post_id), parent=blog_key())
-		like = Like(post=post, author=user, parent=blog_key())
-		like.put()
+		like = Like.gql("WHERE author = :author AND post = :post", author = user, post = post).get()
+		if not like:
+			like = Like(post=post, author=user, parent=blog_key())
+			like.put()
 		self.redirect('/post/%s' % post_id)
 
 class UnlikeHandler(Handler):
