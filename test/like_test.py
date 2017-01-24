@@ -41,9 +41,6 @@ class AppTest(unittest.TestCase):
         self.post = blog.Post(subject="test", content="test", author=user, parent=blog.blog_key())
         self.post.put()
         self.post_id = str(self.post.key().id())
-
-        like = blog.Like(post=self.post, author=self.user, parent=blog.blog_key())
-        like.put()
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -58,18 +55,24 @@ class AppTest(unittest.TestCase):
     
     def test_like_handler(self):
         self.login()
-        self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 0)
         
         response = self.testapp.post('/post/' + self.post_id + '/like')
         self.assertEqual(response.status_int, 302)
         response = response.follow()
         self.assertEqual(response.body, template('post/post.html', post=self.post))
         
-        self.assertEqual(len(self.post.likes.fetch(limit=20)), 2)
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
+        #users can only have one like at a time per post
+        response = self.testapp.post('/post/' + self.post_id + '/like')
+        response = response.follow()
+
+        self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
 
     def test_unlike_handler(self):
+        like = blog.Like(post=self.post, author=self.user, parent=blog.blog_key())
+        like.put()
         self.login()
-
         self.assertEqual(len(self.post.likes.fetch(limit=20)), 1)
         
         response = self.testapp.post('/post/' + self.post_id + '/unlike')
