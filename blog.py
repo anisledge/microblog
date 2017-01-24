@@ -180,6 +180,11 @@ class LikeHandler(Handler):
 	def post(self, post_id):
 		user = self.valid_user_cookie()
 		post = Post.get_by_id(int(post_id), parent=blog_key())
+		
+		if not (bool(user) and (user.username != post.author.username)):
+			self.redirect('/signup')
+			return
+		
 		like = Like.gql("WHERE author = :author AND post = :post", author = user, post = post).get()
 		if not like:
 			like = Like(post=post, author=user, parent=blog_key())
@@ -190,6 +195,11 @@ class UnlikeHandler(Handler):
 	def post(self, post_id):
 		user = self.valid_user_cookie()
 		post = Post.get_by_id(int(post_id), parent=blog_key())
+
+		if not (bool(user) and (user.username != post.author.username)):
+			self.redirect('/signup')
+			return
+
 		like = Like.gql("WHERE author = :author AND post = :post", author = user, post = post).get()
 		if like:
 			like.delete()
