@@ -44,6 +44,10 @@ class AppTest(unittest.TestCase):
         self.post = blog.Post(subject="test", content="test", author=self.user2, parent=blog.blog_key())
         self.post.put()
         self.post_id = str(self.post.key().id())
+
+        self.comment = blog.Comment(text="test", author=self.user, parent=blog.blog_key())
+        self.comment.put()
+        self.comment_id = str(self.comment.key().id())
         
     def tearDown(self):
         self.testbed.deactivate()
@@ -67,17 +71,17 @@ class AppTest(unittest.TestCase):
     def test_create_comment_handler(self):
         response = self.testapp.get('/post/' + self.post_id + '/comment/new')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Comment on post %s" % self.post_id)
+        self.assertEqual(response.body, template('comment/new.html', post=self.post))
 
     def test_edit_comment_handler(self):
-        response = self.testapp.get('/post/' + self.post_id + '/comment/' + '12345' + '/edit')
+        response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/edit')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Edit comment %s" % '12345')
+        self.assertEqual(response.body, template('comment/edit.html', comment=self.comment, post=self.post))
 
     def test_delete_comment_handler(self):
-        response = self.testapp.get('/post/' + self.post_id + '/comment/' + '12345' + '/delete')
+        response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/delete')
         self.assertEqual(response.status_int, 200)
-        self.assertEqual(response.body, "Delete comment %s" % '12345')
+        self.assertEqual(response.body, template('comment/delete.html', comment=self.comment, post=self.post))
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
