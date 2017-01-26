@@ -216,7 +216,7 @@ class CreateCommentHandler(Handler):
 class EditCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		post = Post.get_by_id(int(post_id), parent=blog_key())
-		self.render('comment/new.html', post=post)
+		self.render('comment/edit.html', comment=comment, post=comment.post)
 
 	def post(self, post_id, comment_id):
 		self.redirect('/post/%s' % post_id)
