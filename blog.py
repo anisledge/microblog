@@ -5,7 +5,7 @@ import jinja2
 from validation import detect_errors
 from security import make_secure_val, check_secure_val, make_pw_hash, valid_pw
 from google.appengine.ext import db
-from model import User, Post, Like
+from model import User, Post, Like, Comment
  
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -207,15 +207,18 @@ class UnlikeHandler(Handler):
 
 class CreateCommentHandler(Handler):
 	def get(self, post_id):
-		self.response.out.write("Comment on post %s" % post_id)
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		self.render('comment/new.html', post=post)
 
 class EditCommentHandler(Handler):
 	def get(self, post_id, comment_id):
-		self.response.out.write("Edit comment %s" % comment_id)
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		self.render('comment/new.html', post=post)
 
 class DeleteCommentHandler(Handler):
 	def get(self, post_id, comment_id):
-		self.response.out.write("Delete comment %s" % comment_id)
+		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
+		self.render('comment/delete.html', comment=comment, post=comment.post)
 
 app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/signup', Signup),
