@@ -25,6 +25,11 @@
 		<input type="submit" value="Unlike"/>
 	</form>
 	<p>{{ post.likes.count() }} Likes</p>
+	<ul>
+	{% for comment in post.comments %}
+		<li>{{ comment.text }} <a href="/user/{{ comment.author.key().id() }}">{{ comment.author.username }}</a></li>
+	{% endfor %}
+	</ul>
 	{% else %}
 		<p>Sorry, the post was not found.</p>
 	{% endif %}
