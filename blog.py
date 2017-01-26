@@ -215,8 +215,9 @@ class CreateCommentHandler(Handler):
 
 class EditCommentHandler(Handler):
 	def get(self, post_id, comment_id):
+		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
 		post = Post.get_by_id(int(post_id), parent=blog_key())
-		self.render('comment/edit.html', comment=comment, post=comment.post)
+		self.render('comment/edit.html', comment=comment, post=post)
 
 	def post(self, post_id, comment_id):
 		self.redirect('/post/%s' % post_id)
@@ -224,7 +225,8 @@ class EditCommentHandler(Handler):
 class DeleteCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
-		self.render('comment/delete.html', comment=comment, post=comment.post)
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		self.render('comment/delete.html', comment=comment, post=post)
 
 	def post(self, post_id, comment_id):
 		self.redirect('/post/%s' % post_id)
