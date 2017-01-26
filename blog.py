@@ -211,6 +211,12 @@ class CreateCommentHandler(Handler):
 		self.render('comment/new.html', post=post)
 
 	def post(self, post_id):
+		user = self.valid_user_cookie()
+		post = Post.get_by_id(int(post_id), parent=blog_key())
+		text = self.request.get("text")
+		
+		comment = Comment(text=text, author=user, post=post, parent=blog_key())
+		comment.put()
 		self.redirect('/post/%s' % post_id)
 
 class EditCommentHandler(Handler):
@@ -220,6 +226,11 @@ class EditCommentHandler(Handler):
 		self.render('comment/edit.html', comment=comment, post=post)
 
 	def post(self, post_id, comment_id):
+		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
+		text = self.request.get("text")
+		
+		comment.text = text
+		comment.put()
 		self.redirect('/post/%s' % post_id)
 
 class DeleteCommentHandler(Handler):
@@ -229,6 +240,8 @@ class DeleteCommentHandler(Handler):
 		self.render('comment/delete.html', comment=comment, post=post)
 
 	def post(self, post_id, comment_id):
+		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
+		comment.delete()
 		self.redirect('/post/%s' % post_id)
 
 app = webapp2.WSGIApplication([('/', IndexHandler),
