@@ -210,15 +210,24 @@ class CreateCommentHandler(Handler):
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 		self.render('comment/new.html', post=post)
 
+	def post(self, post_id):
+		self.redirect('/post/%s' % post_id)
+
 class EditCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		post = Post.get_by_id(int(post_id), parent=blog_key())
 		self.render('comment/new.html', post=post)
 
+	def post(self, post_id, comment_id):
+		self.redirect('/post/%s' % post_id)
+
 class DeleteCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
 		self.render('comment/delete.html', comment=comment, post=comment.post)
+
+	def post(self, post_id, comment_id):
+		self.redirect('/post/%s' % post_id)
 
 app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/signup', Signup),
