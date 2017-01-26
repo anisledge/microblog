@@ -205,6 +205,18 @@ class UnlikeHandler(Handler):
 			like.delete()
 		self.redirect('/post/%s' % post_id)
 
+class CreateCommentHandler(Handler):
+	def get(self, post_id):
+		self.response.out.write("Comment on post %s" % post_id)
+
+class EditCommentHandler(Handler):
+	def get(self, post_id, comment_id):
+		self.response.out.write("Edit comment %s" % comment_id)
+
+class DeleteCommentHandler(Handler):
+	def get(self, post_id, comment_id):
+		self.response.out.write("Delete comment %s" % comment_id)
+
 app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/signup', Signup),
 							('/login', Login),
@@ -216,5 +228,8 @@ app = webapp2.WSGIApplication([('/', IndexHandler),
 							('/post/([0-9]+)/delete', DeletePostHandler),
 							('/post/([0-9]+)/like', LikeHandler),
 							('/post/([0-9]+)/unlike', UnlikeHandler),
+							('/post/([0-9]+)/comment/new', CreateCommentHandler),
+							('/post/([0-9]+)/comment/([0-9]+)/edit', EditCommentHandler),
+							('/post/([0-9]+)/comment/([0-9]+)/delete', DeleteCommentHandler),
 							],
 							debug=True)
