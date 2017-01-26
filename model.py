@@ -18,6 +18,6 @@ class Like(db.Model):
 	post = db.ReferenceProperty(Post, collection_name='likes')
 
 class Comment(db.Model):
-	author = db.ReferenceProperty(User, collection_name='likes')
-	post = db.ReferenceProperty(Post, collection_name='likes')
+	author = db.ReferenceProperty(User, collection_name='comments')
+	post = db.ReferenceProperty(Post, collection_name='comments')
 	text = db.TextProperty(required = True)
