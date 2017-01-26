@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% if post %}
+	<h2>New Comment on {{ post.subject }}</h2>
+
+	<form method="POST">
+		<label>
+			<div>Text</div>
+			<textarea name="content"></textarea>
+		</label>
+		{% if error %}
+		<div class="error">Comment cannot be blank.</div>
+		{% endif %}
+		<div>
+			<input type="submit" />
+		</div>
+	</form>
+	<a href="/post/{{ post.key().id() }}">Cancel</a>
+	{% else %}
+		<p>Sorry, the post was not found.</p>
+	{% endif %}
+{% endblock %}
