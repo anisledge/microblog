@@ -16,3 +16,8 @@ class Post(db.Model):
 class Like(db.Model):
 	author = db.ReferenceProperty(User, collection_name='likes')
 	post = db.ReferenceProperty(Post, collection_name='likes')
+
+class Comment(db.Model):
+	author = db.ReferenceProperty(User, collection_name='likes')
+	post = db.ReferenceProperty(Post, collection_name='likes')
+	text = db.TextProperty(required = True)
