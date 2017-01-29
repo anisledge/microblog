@@ -11,7 +11,7 @@ from google.appengine.ext import testbed
 from google.appengine.api import datastore
 import unittest
 import webtest
-import blog
+import blog 
 
 #Setup jinja2 templates
 import jinja2
@@ -45,7 +45,7 @@ class AppTest(unittest.TestCase):
         self.post.put()
         self.post_id = str(self.post.key().id())
 
-        self.comment = blog.Comment(text="test", author=self.user, parent=blog.blog_key())
+        self.comment = blog.Comment(text="test", author=self.user, post=self.post, parent=blog.blog_key())
         self.comment.put()
         self.comment_id = str(self.comment.key().id())
         
@@ -73,16 +73,104 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('comment/new.html', post=self.post))
 
+    def test_create_comment_valid(self):
+        self.login1()
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+
+        response = self.testapp.get('/post/' + self.post_id + '/comment/new')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+
+        form['text'] = "test-create"
+        valid_create = form.submit()
+        self.assertEqual(valid_create.status_int, 302)
+        
+        response = valid_create.follow()
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 2)
+
+    def test_create_comment_invalid(self):
+        self.login1()
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+
+        response = self.testapp.get('/post/' + self.post_id + '/comment/new')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+        
+        form['text'] = ''
+        invalid_create = form.submit()
+        self.assertNotEqual(invalid_create.status_int, 302)
+        self.assertEqual(invalid_create.body, template('comment/new.html', post=self.post, error=True))
+        self.assertEqual(invalid_create.form['text'].value, '')
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+
     def test_edit_comment_handler(self):
         response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/edit')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('comment/edit.html', comment=self.comment, post=self.post))
+        
+
+        self.assertEqual(response.form['text'].value, self.comment.text)
+
+    def test_edit_comment_valid(self):
+        self.login1()
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+        comment = blog.Comment.get_by_id(int(self.comment_id), parent=blog.blog_key())
+        self.assertEqual(str(comment.text), 'test')
+
+        response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/edit')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+        
+        form['text'] = 'test-edit'
+        valid_edit = form.submit()
+        self.assertEqual(valid_edit.status_int, 302)
+
+        response = valid_edit.follow()
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+
+        comment = blog.Comment.get_by_id(int(self.comment_id), parent=blog.blog_key())
+        self.assertEqual(str(comment.text), 'test-edit')
+
+    def test_edit_comment_invalid(self):
+        self.login1()
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+        comment = blog.Comment.get_by_id(int(self.comment_id), parent=blog.blog_key())
+        self.assertEqual(str(comment.text), 'test')
+
+        response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/edit')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+        
+        form['text'] = ''
+        invalid_edit = form.submit()
+        self.assertNotEqual(invalid_edit.status_int, 302)
+        
+        self.assertEqual(invalid_edit.body, template('comment/edit.html', comment=self.comment, post=self.post, error=True))
+        self.assertEqual(invalid_edit.form['text'].value, comment.text)
+
+        comment = blog.Comment.get_by_id(int(self.comment_id), parent=blog.blog_key())
+        self.assertEqual(str(comment.text), 'test')
 
     def test_delete_comment_handler(self):
         response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/delete')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.body, template('comment/delete.html', comment=self.comment, post=self.post))
 
+    def test_delete_comment_valid(self):
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 1)
+
+        response = self.testapp.get('/post/' + self.post_id + '/comment/' + self.comment_id + '/delete')
+        form = response.form
+        self.assertEqual(form.method, 'POST')
+        valid_delete = form.submit()
+        self.assertEqual(valid_delete.status_int, 302)
+
+        response = valid_delete.follow()
+        self.assertEqual(response.body, template('post/post.html', post=self.post))
+        
+        self.assertEqual(len(self.post.comments.fetch(limit=20)), 0)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(AppTest)
 unittest.TextTestRunner(verbosity=2).run(suite)
