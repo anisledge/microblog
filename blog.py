@@ -213,12 +213,15 @@ class CreateCommentHandler(Handler):
 	def post(self, post_id):
 		user = self.valid_user_cookie()
 		post = Post.get_by_id(int(post_id), parent=blog_key())
-		text = self.request.get("text")
 		
-		comment = Comment(text=text, author=user, post=post, parent=blog_key())
-		comment.put()
-		self.redirect('/post/%s' % post_id)
-
+		text = self.request.get("text")
+		if text:
+			comment = Comment(text=text, author=user, post=post, parent=blog_key())
+			comment.put()
+			self.redirect('/post/%s' % post_id)
+		else: 
+			self.render('comment/new.html', post=post, error=True)
+		
 class EditCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
@@ -227,12 +230,16 @@ class EditCommentHandler(Handler):
 
 	def post(self, post_id, comment_id):
 		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
-		text = self.request.get("text")
+		post = Post.get_by_id(int(post_id), parent=blog_key())
 		
-		comment.text = text
-		comment.put()
-		self.redirect('/post/%s' % post_id)
-
+		text = self.request.get("text")
+		if text:
+			comment.text = text
+			comment.put()
+			self.redirect('/post/%s' % post_id)
+		else: 
+			self.render('comment/edit.html', comment=comment, post=post, error=True)
+		
 class DeleteCommentHandler(Handler):
 	def get(self, post_id, comment_id):
 		comment = Comment.get_by_id(int(comment_id), parent=blog_key())
